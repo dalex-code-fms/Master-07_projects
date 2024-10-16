@@ -91,7 +91,6 @@ UPDATE T_Articles SET IdCategory = 3 WHERE Description = 'MacBrute';
 UPDATE T_Articles SET IdCategory = 2 WHERE Description = 'Iphone50';
 UPDATE T_Articles SET IdCategory = 2 WHERE Description = 'Nokia3310';
 
--- UPDATE T_Articles SET CatName = (SELECT CatName FROM T_Categories WHERE T_Categories.idCategory = T_Articles.IdCategory);
 
 SELECT a.IdArticle, a.Description, a.Brand, a.UnitaryPrice, c.CatName FROM T_Articles AS a JOIN T_Categories AS c ON a.IdCategory = c.IdCategory;
 
