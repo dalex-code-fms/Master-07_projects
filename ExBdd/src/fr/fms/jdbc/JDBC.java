@@ -1,5 +1,6 @@
 package fr.fms.jdbc;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -7,16 +8,19 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Properties;
 
 import fr.fms.entities.Article;
 
 public class JDBC {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
+		Properties prop = CreateConfigFile.readPropertiesFile("conf.properties");
 
-		loadJDBCdriver();
+		loadJDBCdriver(prop.getProperty("db.driver.class"));
 
-		try (Connection connection = connectToDB()) {
+		try (Connection connection = connectToDB(prop.getProperty("db.url"), prop.getProperty("db.login"),
+				prop.getProperty("db.pwd"))) {
 
 			if (connection != null) {
 				// EXO 2
@@ -37,18 +41,15 @@ public class JDBC {
 
 	}
 
-	public static void loadJDBCdriver() {
+	public static void loadJDBCdriver(String jbdcDriver) {
 		try {
-			Class.forName("org.mariadb.jdbc.Driver");
+			Class.forName(jbdcDriver);
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public static Connection connectToDB() {
-		String url = "jdbc:mariadb://localhost:3306/shop";
-		String login = "root";
-		String pwd = "fms2024";
+	public static Connection connectToDB(String url, String login, String pwd) {
 
 		try {
 			return DriverManager.getConnection(url, login, pwd);
