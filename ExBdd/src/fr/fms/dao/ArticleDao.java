@@ -12,25 +12,15 @@ import fr.fms.entities.Article;
 import fr.fms.entities.BddConnection;
 
 public class ArticleDao implements Dao<Article> {
-	private Connection connection;
+
 	private static final Logger LOGGER = Logger.getLogger(Dao.class.getName());
-
-	public ArticleDao() {
-
-		try {
-			this.connection = BddConnection.getConnection();
-		} catch (RuntimeException e) {
-			LOGGER.severe("Probleme de connexion à la bdd: " + e.getMessage());
-			throw new RuntimeException("Probleme de connexion à la bdd: ", e);
-		}
-
-	}
 
 	@Override
 	public void create(Article obj) {
 		String strSql = "INSERT INTO T_Articles ( Description, Brand, UnitaryPrice, IdCategory ) VALUES (?,?,?,?);";
 
-		try (PreparedStatement ps = connection.prepareStatement(strSql)) {
+		try (Connection connection = BddConnection.getInstance().getConnection()) {
+			PreparedStatement ps = connection.prepareStatement(strSql);
 			ps.setString(1, obj.getDescription());
 			ps.setString(2, obj.getBrand());
 			ps.setDouble(3, obj.getPrice());
@@ -49,7 +39,8 @@ public class ArticleDao implements Dao<Article> {
 		String strSql = "SELECT a.IdArticle, a.Description, a.Brand, a.UnitaryPrice, c.CatName, c.Description FROM T_Articles AS a JOIN T_Categories AS c ON a.IdCategory = c.IdCategory WHERE a.IdArticle = ?;";
 		Article article = null;
 
-		try (PreparedStatement ps = connection.prepareStatement(strSql)) {
+		try (Connection connection = BddConnection.getInstance().getConnection()) {
+			PreparedStatement ps = connection.prepareStatement(strSql);
 			ps.setInt(1, id);
 			try (ResultSet resultSet = ps.executeQuery()) {
 				if (resultSet.next()) {
@@ -76,7 +67,8 @@ public class ArticleDao implements Dao<Article> {
 		String strSql = "UPDATE T_Articles SET Description = ?, Brand = ?, UnitaryPrice = ? WHERE IdArticle = ?;";
 
 		boolean updated = false;
-		try (PreparedStatement ps = connection.prepareStatement(strSql)) {
+		try (Connection connection = BddConnection.getInstance().getConnection();
+				PreparedStatement ps = connection.prepareStatement(strSql)) {
 			ps.setString(1, obj.getDescription());
 			ps.setString(2, obj.getBrand());
 			ps.setDouble(3, obj.getPrice());
@@ -98,7 +90,9 @@ public class ArticleDao implements Dao<Article> {
 	public boolean delete(int id) {
 		String strSql = "DELETE FROM T_Articles WHERE IdArticle = ?;";
 		boolean deleted = false;
-		try (PreparedStatement ps = connection.prepareStatement(strSql)) {
+
+		try (Connection connection = BddConnection.getInstance().getConnection();
+				PreparedStatement ps = connection.prepareStatement(strSql)) {
 			ps.setInt(1, id);
 
 			if (ps.executeUpdate() == 1) {
@@ -118,19 +112,18 @@ public class ArticleDao implements Dao<Article> {
 		String strSql = "SELECT * FROM T_Articles;";
 		ArrayList<Article> articles = new ArrayList<>();
 
-		try (Statement statement = connection.createStatement()) {
+		try (Connection connection = BddConnection.getInstance().getConnection();
+				Statement statement = connection.createStatement();
+				ResultSet resultSet = statement.executeQuery(strSql)) {
 
-			try (ResultSet resultSet = statement.executeQuery(strSql)) {
+			while (resultSet.next()) {
+				int rsIdUser = resultSet.getInt(1);
+				String rsDescription = resultSet.getString(2);
+				String rsBrand = resultSet.getString(3);
+				double rsPrice = resultSet.getDouble(4);
+				int rsIdCategory = resultSet.getInt(5);
 
-				while (resultSet.next()) {
-					int rsIdUser = resultSet.getInt(1);
-					String rsDescription = resultSet.getString(2);
-					String rsBrand = resultSet.getString(3);
-					double rsPrice = resultSet.getDouble(4);
-					int rsIdCategory = resultSet.getInt(5);
-
-					articles.add(new Article(rsIdUser, rsDescription, rsBrand, rsPrice, rsIdCategory));
-				}
+				articles.add(new Article(rsIdUser, rsDescription, rsBrand, rsPrice, rsIdCategory));
 			}
 		} catch (SQLException e) {
 			LOGGER.severe("Probleme dans la lecture de tout les articles " + e.getMessage());

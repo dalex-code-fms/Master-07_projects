@@ -13,24 +13,14 @@ import fr.fms.entities.User;
 
 public class UserDao implements Dao<User> {
 
-	private Connection connection;
 	private static final Logger LOGGER = Logger.getLogger(Dao.class.getName());
-
-	public UserDao() {
-
-		try {
-			this.connection = BddConnection.getConnection();
-		} catch (RuntimeException e) {
-			LOGGER.severe("Probleme de connexion à la bdd: " + e.getMessage());
-			throw new RuntimeException("Probleme de connexion à la bdd: ", e);
-		}
-	}
 
 	@Override
 	public void create(User obj) {
 		String strSql = "INSERT INTO T_Users ( Login, Password ) VALUES (?,?);";
 
-		try (PreparedStatement ps = connection.prepareStatement(strSql)) {
+		try (Connection connection = BddConnection.getInstance().getConnection();
+				PreparedStatement ps = connection.prepareStatement(strSql)) {
 			ps.setString(1, obj.getLogin());
 			ps.setString(2, obj.getPassword());
 
@@ -48,7 +38,8 @@ public class UserDao implements Dao<User> {
 		String strSql = "SELECT * FROM T_Users WHERE T_Users.IdUser = ?;";
 		User user = null;
 
-		try (PreparedStatement ps = connection.prepareStatement(strSql)) {
+		try (Connection connection = BddConnection.getInstance().getConnection();
+				PreparedStatement ps = connection.prepareStatement(strSql)) {
 			ps.setInt(1, id);
 			try (ResultSet resultSet = ps.executeQuery()) {
 				if (resultSet.next()) {
@@ -72,7 +63,8 @@ public class UserDao implements Dao<User> {
 		String strSql = "UPDATE T_Users SET Login = ?, Password = ? WHERE IdUser = ?;";
 
 		boolean updated = false;
-		try (PreparedStatement ps = connection.prepareStatement(strSql)) {
+		try (Connection connection = BddConnection.getInstance().getConnection();
+				PreparedStatement ps = connection.prepareStatement(strSql)) {
 			ps.setString(1, obj.getLogin());
 			ps.setString(2, obj.getPassword());
 			ps.setInt(3, id);
@@ -93,7 +85,8 @@ public class UserDao implements Dao<User> {
 	public boolean delete(int id) {
 		String strSql = "DELETE FROM T_Users WHERE IdUser = ?;";
 		boolean deleted = false;
-		try (PreparedStatement ps = connection.prepareStatement(strSql)) {
+		try (Connection connection = BddConnection.getInstance().getConnection();
+				PreparedStatement ps = connection.prepareStatement(strSql)) {
 			ps.setInt(1, id);
 
 			if (ps.executeUpdate() == 1) {
@@ -113,18 +106,18 @@ public class UserDao implements Dao<User> {
 		String strSql = "SELECT * FROM T_Users;";
 		ArrayList<User> users = new ArrayList<>();
 
-		try (Statement statement = connection.createStatement()) {
+		try (Connection connection = BddConnection.getInstance().getConnection();
+				Statement statement = connection.createStatement();
+				ResultSet resultSet = statement.executeQuery(strSql)) {
 
-			try (ResultSet resultSet = statement.executeQuery(strSql)) {
+			while (resultSet.next()) {
+				int idUser = resultSet.getInt(1);
+				String login = resultSet.getString(2);
+				String password = resultSet.getString(3);
 
-				while (resultSet.next()) {
-					int idUser = resultSet.getInt(1);
-					String login = resultSet.getString(2);
-					String password = resultSet.getString(3);
-
-					users.add(new User(idUser, login, password));
-				}
+				users.add(new User(idUser, login, password));
 			}
+
 		} catch (SQLException e) {
 			LOGGER.severe("Probleme dans la lecture de tout les utilisateurs " + e.getMessage());
 			throw new RuntimeException("Probleme dans la lecture de tout les utilisateurs ", e);

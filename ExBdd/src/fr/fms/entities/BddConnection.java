@@ -11,6 +11,7 @@ import fr.fms.jdbc.CreateConfigFile;
 
 public class BddConnection {
 
+	private static BddConnection instance;
 	private static final Logger LOGGER = Logger.getLogger(BddConnection.class.getName());
 	private static final String FILENAME = "conf.properties";
 	private static final String DRIVER = "db.driver.class";
@@ -18,11 +19,24 @@ public class BddConnection {
 	private static final String LOGIN = "db.login";
 	private static final String PASSWORD = "db.pwd";
 
-	public static Connection getConnection() {
+	private BddConnection() {
+
+	}
+
+	public static BddConnection getInstance() {
+		if (instance == null) {
+			instance = new BddConnection();
+		}
+		return instance;
+	}
+
+	public Connection getConnection() {
 
 		try {
 			Properties prop = CreateConfigFile.readPropertiesFile(FILENAME);
+
 			loadJdbcDriver(prop.getProperty(DRIVER));
+
 			return DriverManager.getConnection(prop.getProperty(URL), prop.getProperty(LOGIN),
 					prop.getProperty(PASSWORD));
 		} catch (IOException e) {
