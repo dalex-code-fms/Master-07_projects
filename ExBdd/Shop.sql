@@ -97,9 +97,11 @@ SELECT a.IdArticle, a.Description, a.Brand, a.UnitaryPrice, c.CatName FROM T_Art
 CREATE TABLE T_Users (
 	IdUser			int(4) PRIMARY KEY AUTO_INCREMENT,
 	Login			varchar(20) NOT NULL,
-	Password		varchar(20) NOT NULL,
+	Password		varchar(20) NOT NULL
 ) ENGINE = InnoDB;
 
-INSERT INTO T_Users ( Login, Password ) VALUES (david, fms123);
-INSERT INTO T_Users ( Login, Password ) VALUES (fms, fms123);
+INSERT INTO T_Users ( Login, Password ) VALUES ('David', 'fms123');
+INSERT INTO T_Users ( Login, Password ) VALUES ('Fms', 'fms123');
+
+SELECT * FROM T_Users;
 
