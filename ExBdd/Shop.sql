@@ -100,4 +100,6 @@ CREATE TABLE T_Users (
 	Password		varchar(20) NOT NULL,
 ) ENGINE = InnoDB;
 
+INSERT INTO T_Users ( Login, Password ) VALUES (david, fms123);
+INSERT INTO T_Users ( Login, Password ) VALUES (fms, fms123);
 

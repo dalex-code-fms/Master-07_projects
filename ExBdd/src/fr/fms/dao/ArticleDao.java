@@ -28,12 +28,13 @@ public class ArticleDao implements Dao<Article> {
 
 	@Override
 	public void create(Article obj) {
-		String strSql = "INSERT INTO T_Articles ( Description, Brand, UnitaryPrice ) VALUES (?,?,?);";
+		String strSql = "INSERT INTO T_Articles ( Description, Brand, UnitaryPrice, IdCategory ) VALUES (?,?,?,?);";
 
 		try (PreparedStatement ps = connection.prepareStatement(strSql)) {
 			ps.setString(1, obj.getDescription());
 			ps.setString(2, obj.getBrand());
 			ps.setDouble(3, obj.getPrice());
+			ps.setDouble(4, obj.getIdCategory());
 
 			ps.executeUpdate();
 

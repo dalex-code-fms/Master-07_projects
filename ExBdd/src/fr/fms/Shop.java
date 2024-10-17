@@ -11,9 +11,10 @@ public class Shop {
 		ArticleDao dao = new ArticleDao();
 
 		// displayListOfArticles(dao.readAll());
-		// dao.Create(new Article("Ecouteurs", "Samxhung", 199, 4));
+		// dao.create(new Article("Ecouteurs", "Samxhung", 199, 4));
 		displayListOfArticles(dao.readAll());
-		dao.delete(19);
+		dao.delete(26);
+		displayListOfArticles(dao.readAll());
 
 	}
 
