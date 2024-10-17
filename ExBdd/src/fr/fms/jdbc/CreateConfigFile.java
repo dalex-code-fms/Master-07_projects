@@ -4,23 +4,21 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 public class CreateConfigFile {
 
-	public static Properties readPropertiesFile(String fileName) throws IOException {
-		FileInputStream fis = null;
-		Properties prop = null;
+	private static final Logger LOGGER = Logger.getLogger(CreateConfigFile.class.getName());
 
-		try {
-			fis = new FileInputStream(fileName);
-			prop = new Properties();
+	public static Properties readPropertiesFile(String fileName) throws IOException {
+
+		Properties prop = new Properties();
+
+		try (FileInputStream fis = new FileInputStream(fileName)) {
 			prop.load(fis);
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			fis.close();
+			LOGGER.severe(String.format("Le fichier: %s n'a pas été trouvé.%n", fileName));
+			throw new FileNotFoundException(fileName);
 		}
 
 		return prop;
