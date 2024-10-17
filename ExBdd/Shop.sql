@@ -94,6 +94,10 @@ UPDATE T_Articles SET IdCategory = 2 WHERE Description = 'Nokia3310';
 
 SELECT a.IdArticle, a.Description, a.Brand, a.UnitaryPrice, c.CatName FROM T_Articles AS a JOIN T_Categories AS c ON a.IdCategory = c.IdCategory;
 
-
+CREATE TABLE T_Users (
+	IdUser			int(4) PRIMARY KEY AUTO_INCREMENT,
+	Login			varchar(20) NOT NULL,
+	Password		varchar(20) NOT NULL,
+) ENGINE = InnoDB;
 
 
