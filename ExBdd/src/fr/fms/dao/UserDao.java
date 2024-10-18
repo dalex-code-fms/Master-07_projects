@@ -28,11 +28,9 @@ public class UserDao implements Dao<User> {
 				if (resultSet.next())
 					userId = resultSet.getInt("IdUser");
 			}
-
 		} catch (SQLException e) {
 
 		}
-
 		return userId;
 	}
 

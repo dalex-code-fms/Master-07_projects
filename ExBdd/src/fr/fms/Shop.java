@@ -3,28 +3,31 @@ package fr.fms;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import fr.fms.dao.ArticleDao;
-import fr.fms.dao.UserDao;
 import fr.fms.entities.Article;
 import fr.fms.entities.User;
+import fr.fms.job.IJobImp;
 
 public class Shop {
 
+	private ArrayList<Article> cartList = new ArrayList<Article>();
+
 	public static void main(String[] args) {
-		ArticleDao dao = new ArticleDao();
-		UserDao udao = new UserDao();
-		// udao.create(new User("sabrina@fms.fr", "sabrina123"));
-		// udao.create(new User("kaenna@fms.fr", "kaenna123"));
-		// displayListOfArticles(dao.readAll());
-		// dao.create(new Article("Ecouteurs", "Samxhung", 199, 4));
-		// displayListOfArticles(dao.readAll());
-		// dao.delete(26);
-		// displayListOfArticles(dao.readAll());
+		Shop shop = new Shop();
+		IJobImp job = new IJobImp();
+
+		// job.createUser(new User("sabrina@fms.fr", "sabrina123"));
+		// job.createUser(new User("kaenna@fms.fr", "kaenna123"));
+
+		// displayListOfArticles(job.readAllArticles());
+		// job.createArticle(new Article("Ecouteurs", "Samxhung", 199, 4));
+		// displayListOfArticles(job.readAllArticles());
+		// job.deleteArticle(26);
+		// displayListOfArticles(job.readAllArticles());
 		// displayUser(udao.read(2));
-		// udao.update(new User("Sabrina", "sasa123"), 4);
-		// displayUser(udao.read(4));
-		// udao.delete(2);
-		// displayListOfUsers(udao.readAll());
+		// job.updateUser(new User("Sabrina", "sasa123"), 4);
+		// displayUser(job.readUser(4));
+		// job.deleteUser(2);
+		// displayListOfUsers(job.readAllUsers());
 
 		Scanner sc = new Scanner(System.in);
 
@@ -32,62 +35,69 @@ public class Shop {
 		boolean runningApp = true;
 
 		while (runningApp) {
-			System.out.println("1 - Montrer articles disponibles");
-			if (!userConnected)
-				System.out.println("2 - Se connecter");
-			if (userConnected)
-				System.out.println("3 - Se deconnecter");
-			System.out.println("4 - Sortir");
-
-			int userInputChoice = sc.nextInt();
-			sc.nextLine();
-
-			switch (userInputChoice) {
-			case 1:
-				if (userConnected) {
-					displayListOfArticles(dao.readAll());
-				} else {
-					System.out.println("Veuillez vous connecter pour afficher les articles ! \n");
-				}
-				break;
-			case 2:
-				System.out.print("Login: ");
-				String userInputLogin = sc.nextLine();
-				System.out.println("Password: ");
-				String userInputPassword = sc.nextLine();
-
-				if (udao.verifyIfUserExists(userInputLogin, userInputPassword) != null) {
-					userConnected = true;
-					System.out.println("Utilisateur connecté\n");
-				} else {
-					System.out.println("Email ou mot de pass incorrects\n");
-				}
-				break;
-			case 3:
-				userConnected = false;
-				System.out.println("Deconexion reussi.\n");
-				break;
-			case 4:
-				System.out.println("Aurevoir !\n");
-				runningApp = false;
-				break;
-			default:
-				System.out.println("Choix invalide, veuillez reesayer !\n");
-				break;
+			if (!userConnected) {
+				userConnected = shop.loginMenu(sc, job);
 			}
+
+			if (userConnected) {
+				shop.displayHomeMenu();
+
+				int userScannerChoice = sc.nextInt();
+
+				switch (userScannerChoice) {
+				case 1:
+					shop.displayListOfArticles(job.readAllArticles());
+				}
+			}
+
 		}
+
 		sc.close();
 
 	}
 
-	public static void displayUser(User user) {
+	public void displayHomeMenu() {
+		System.out.println(" --------------- Bienvenue dans FMS Shop ---------------\n");
+		System.out.println("Veuillez choisir une option: ");
+		System.out.println("1 - Liste d'articles disponibles | 2 - Panier");
+	}
+
+	public boolean loginMenu(Scanner sc, IJobImp job) {
+		boolean userConnected = false;
+
+		System.out.println(" --------------- Connexion Menu ---------------");
+		System.out.println("Veuillez saisir: ");
+		System.out.print(" - Email: ");
+		String userScannerEmail = sc.nextLine();
+		System.out.print(" - Mot de pass: ");
+		String userScannerPassword = sc.nextLine();
+
+		if (job.login(userScannerEmail, userScannerPassword) != null) {
+			userConnected = true;
+			System.out.println("Connexion réussi !\n");
+		} else {
+			System.out.println("Email et/ou mot de passe incorrects\n");
+		}
+
+		return userConnected;
+	}
+
+	public void displayCart() {
+		if (cartList.size() <= 0) {
+			System.out.println("Panier vide !\n");
+		} else {
+			displayListOfArticles(cartList);
+		}
+	}
+
+	public void displayUser(User user) {
 		System.out.printf("%-5s %-28s %-20s%n", "ID", "Login", "Password");
 		System.out.println("---------------------------------------------------------");
 		System.out.printf("%-5d %-28s %-20s%n", user.getId(), user.getLogin(), user.getPassword());
 		System.out.println("---------------------------------------------------------");
 	}
 
-	public static void displayListOfUsers(ArrayList<User> users) {
+	public void displayListOfUsers(ArrayList<User> users) {
 		System.out.printf("%-5s %-28s %-20s%n", "ID", "Login", "Password");
 		System.out.println("---------------------------------------------------------");
 		users.forEach(
@@ -95,7 +105,7 @@ public class Shop {
 		System.out.println("---------------------------------------------------------");
 	}
 
-	public static void displayListOfArticles(ArrayList<Article> articles) {
+	public void displayListOfArticles(ArrayList<Article> articles) {
 		System.out.printf("%-5s %-28s %-20s %-15s %-5s%n", "ID", "Description", "Brand", "Price", "IdCategory");
 		System.out.println("-------------------------------------------------------------------------------------");
 
@@ -104,7 +114,7 @@ public class Shop {
 		System.out.println("-------------------------------------------------------------------------------------");
 	}
 
-	public static void displayArticleInfo(Article article) {
+	public void displayArticleInfo(Article article) {
 		System.out.printf("%-5s %-28s %-20s %-15s %-20s %-30s%n", "ID", "Description", "Brand", "Price", "Cat. Name",
 				"Cat. Description");
 		System.out.println(
