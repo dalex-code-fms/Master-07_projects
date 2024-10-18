@@ -15,6 +15,27 @@ public class UserDao implements Dao<User> {
 
 	private static final Logger LOGGER = Logger.getLogger(Dao.class.getName());
 
+	public Integer verifyIfUserExists(String login, String password) {
+		String strSql = "SELECT * FROM T_Users WHERE Login = ? AND Password = ?;";
+		Integer userId = null;
+
+		try (Connection connection = BddConnection.getInstance().getConnection();
+				PreparedStatement ps = connection.prepareStatement(strSql)) {
+			ps.setString(1, login);
+			ps.setString(2, password);
+
+			try (ResultSet resultSet = ps.executeQuery()) {
+				if (resultSet.next())
+					userId = resultSet.getInt("IdUser");
+			}
+
+		} catch (SQLException e) {
+
+		}
+
+		return userId;
+	}
+
 	@Override
 	public void create(User obj) {
 		String strSql = "INSERT INTO T_Users ( Login, Password ) VALUES (?,?);";

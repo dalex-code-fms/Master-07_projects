@@ -100,8 +100,8 @@ CREATE TABLE T_Users (
 	Password		varchar(20) NOT NULL
 ) ENGINE = InnoDB;
 
-INSERT INTO T_Users ( Login, Password ) VALUES ('David', 'fms123');
-INSERT INTO T_Users ( Login, Password ) VALUES ('Fms', 'fms123');
+INSERT INTO T_Users ( Login, Password ) VALUES ('david@fms.fr', 'fms123');
+INSERT INTO T_Users ( Login, Password ) VALUES ('fms@fms.fr', 'fms123');
 
 SELECT * FROM T_Users;
 

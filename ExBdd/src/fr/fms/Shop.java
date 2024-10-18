@@ -1,6 +1,7 @@
 package fr.fms;
 
 import java.util.ArrayList;
+import java.util.Scanner;
 
 import fr.fms.dao.ArticleDao;
 import fr.fms.dao.UserDao;
@@ -12,8 +13,8 @@ public class Shop {
 	public static void main(String[] args) {
 		ArticleDao dao = new ArticleDao();
 		UserDao udao = new UserDao();
-		// udao.create(new User("Sabrina", "sabrina123"));
-		// udao.create(new User("Kaenna", "kaenna123"));
+		// udao.create(new User("sabrina@fms.fr", "sabrina123"));
+		// udao.create(new User("kaenna@fms.fr", "kaenna123"));
 		// displayListOfArticles(dao.readAll());
 		// dao.create(new Article("Ecouteurs", "Samxhung", 199, 4));
 		// displayListOfArticles(dao.readAll());
@@ -23,7 +24,59 @@ public class Shop {
 		// udao.update(new User("Sabrina", "sasa123"), 4);
 		// displayUser(udao.read(4));
 		// udao.delete(2);
-		displayListOfUsers(udao.readAll());
+		// displayListOfUsers(udao.readAll());
+
+		Scanner sc = new Scanner(System.in);
+
+		boolean userConnected = false;
+		boolean runningApp = true;
+
+		while (runningApp) {
+			System.out.println("1 - Montrer articles disponibles");
+			if (!userConnected)
+				System.out.println("2 - Se connecter");
+			if (userConnected)
+				System.out.println("3 - Se deconnecter");
+			System.out.println("4 - Sortir");
+
+			int userInputChoice = sc.nextInt();
+			sc.nextLine();
+
+			switch (userInputChoice) {
+			case 1:
+				if (userConnected) {
+					displayListOfArticles(dao.readAll());
+				} else {
+					System.out.println("Veuillez vous connecter pour afficher les articles ! \n");
+				}
+				break;
+			case 2:
+				System.out.print("Login: ");
+				String userInputLogin = sc.nextLine();
+				System.out.println("Password: ");
+				String userInputPassword = sc.nextLine();
+
+				if (udao.verifyIfUserExists(userInputLogin, userInputPassword) != null) {
+					userConnected = true;
+					System.out.println("Utilisateur connecté\n");
+				} else {
+					System.out.println("Email ou mot de pass incorrects\n");
+				}
+				break;
+			case 3:
+				userConnected = false;
+				System.out.println("Deconexion reussi.\n");
+				break;
+			case 4:
+				System.out.println("Aurevoir !\n");
+				runningApp = false;
+				break;
+			default:
+				System.out.println("Choix invalide, veuillez reesayer !\n");
+				break;
+			}
+		}
+		sc.close();
 
 	}
 
